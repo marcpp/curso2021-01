@@ -12,6 +12,20 @@ class HelpdeskTicketAction(models.Model):
     )
 
 
+class HelpdeskTicketTag(models.Model):
+    _name = 'helpdesk.ticket.tag'
+    _description = 'Tickets helpdesk action'
+
+    name = fields.Char()
+    tag_ids = fields.Many2many(
+        comodel_name = 'helpdesk.ticket',
+        relation = 'helpdesk_ticket_tag_rel',
+        column1 = 'tag_id',
+        column2 = 'ticket_id',
+        string = 'Tags'
+    )
+
+
 class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
     _description = 'Tickets helpdesk'
@@ -58,6 +72,13 @@ class HelpdeskTicket(models.Model):
         comodel_name = 'helpdesk.ticket.action',
         inverse_name = 'ticket_id',
         string = 'Actions'
+    )
+    tag_ids = fields.Many2many(
+        comodel_name = 'helpdesk.ticket.tag',
+        relation = 'helpdesk_ticket_tag_rel',
+        column1 = 'ticket_id',
+        column2 = 'tag_id',
+        string = 'Tags'
     )
 
 
