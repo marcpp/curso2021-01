@@ -24,7 +24,7 @@ class HelpdeskTicket(models.Model):
         string='State',
         default='nuevo'
     )
-    float = fields.Float(
+    time = fields.Float(
         string='Time'
     )
     assigned = fields.Boolean(
