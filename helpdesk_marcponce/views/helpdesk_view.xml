@@ -19,6 +19,17 @@
         <field name="arch" type="xml">
             <form string="Ticket">
                 <header>
+                    <!-- Asignar, cambia estado a asignado y pone a true el campo asignado, visible sólo con estado = nuevo -->
+                    <button string="Assign" name="state_to_assign" type="object" states="new"/>
+                    <!-- En proceso, visible sólo con estado = asignado -->
+                    <button string="In process" name="state_to_inprocess" type="object" states="assigned"/>
+                    <!-- Pendiente, visible sólo con estado = en proceso o asignado -->
+                    <button string="Pending" name="state_to_pending" type="object" states="inprocess,assigned"/>
+                    <!-- Finalizar, visible en cualquier estado, menos cancelado y finalizado -->
+                    <button string="Finalize" name="state_to_finalize" type="object" attrs="{'invisible': ['|', ('state', '=', 'canceled'), ('state', '=', 'finalized')]}"/>
+                    <!-- Cancelar, visible si no está cancelado -->
+                    <button string="Cancel" name="state_to_cancel" type="object" attrs="{'invisible': [('state', '!=', 'canceled')]}"/>
+
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
