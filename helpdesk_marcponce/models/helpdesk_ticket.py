@@ -1,5 +1,17 @@
 from odoo import models, fields
 
+class HelpdeskTicketAction(models.Model):
+    _name = 'helpdesk.ticket.action'
+    _description = 'Tickets helpdesk action'
+
+    name = fields.Char()
+    date = fields.Date()
+    ticket_id = fields.Many2one(
+        comodel_name = 'helpdesk.ticket',
+        string = "Ticket"
+    )
+
+
 class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
     _description = 'Tickets helpdesk'
@@ -41,6 +53,11 @@ class HelpdeskTicket(models.Model):
     action_preventive = fields.Html(
         string='Preventive Action',
         help='Descrive peventive actions todo'
+    )
+    action_ids = fields.One2many(
+        comodel_name = 'helpdesk.ticket.action',
+        inverse_name = 'ticket_id',
+        string = 'Actions'
     )
 
 
