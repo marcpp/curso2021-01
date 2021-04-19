@@ -15,14 +15,14 @@ class HelpdeskTicket(models.Model):
         string='Date'
     )
     state = fields.Selection(
-        [('nuevo', 'Nuevo'),
-         ('asignado', 'Asignado'),
-         ('pro', 'En proceso'),
-         ('pendiente', 'Pendiente'),
-         ('resuelto', 'Resuelto'),
-         ('cancelado', 'Cancelado')],
+        [('new', 'New'),
+         ('assigned', 'Assigned'),
+         ('inprocess', 'In process'),
+         ('pending', 'Pending'),
+         ('resolved', 'Resolved'),
+         ('canceled', 'Canceled')],
         string='State',
-        default='nuevo'
+        default='new'
     )
     time = fields.Float(
         string='Time'
@@ -43,3 +43,22 @@ class HelpdeskTicket(models.Model):
         help='Descrive peventive actions todo'
     )
 
+
+    def state_to_assign(self):
+        self.state = 'assigned'
+
+
+    def state_to_inprocess(self):
+        self.state = 'inprocess'
+
+
+    def state_to_pending(self):
+        self.state = 'pending'
+
+
+    def state_to_finalize(self):
+        self.state = 'resolved'
+
+
+    def state_to_cancel(self):
+        self.state = 'resolved'
