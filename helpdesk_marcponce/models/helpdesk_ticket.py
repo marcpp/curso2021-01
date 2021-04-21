@@ -68,6 +68,10 @@ class HelpdeskTicket(models.Model):
         string='Preventive Action',
         help='Descrive peventive actions todo'
     )
+    user_id = fields.Many2one(
+        comodel_name = 'res.users',
+        string = 'Assigned to'
+    )
     action_ids = fields.One2many(
         comodel_name = 'helpdesk.ticket.action',
         inverse_name = 'ticket_id',
