@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class HelpdeskTicketAction(models.Model):
     _name = 'helpdesk.ticket.action'
@@ -22,7 +22,7 @@ class HelpdeskTicketTag(models.Model):
         relation = 'helpdesk_ticket_tag_rel',
         column1 = 'tag_id',
         column2 = 'ticket_id',
-        string = 'Tags'
+        string = 'Tickets'
     )
 
 
@@ -55,7 +55,7 @@ class HelpdeskTicket(models.Model):
     )
     assigned = fields.Boolean(
         string='Assigned',
-        readonly=True
+        compute='_compute_assigned'
     )
     date_limit = fields.Date(
         string='Date Limit'
@@ -84,6 +84,13 @@ class HelpdeskTicket(models.Model):
         column2 = 'tag_id',
         string = 'Tags'
     )
+    ticket_qty = fields.Integer(
+        string = 'Ticket QTY',
+        compute = '_compute_ticket_qty'
+    )
+    tag_name = fields.Char(
+        string = 'Tag name'
+    )
 
 
     def state_to_assign(self):
@@ -104,3 +111,24 @@ class HelpdeskTicket(models.Model):
 
     def state_to_cancel(self):
         self.state = 'resolved'
+
+    
+    @api.depends('user_id')
+    def _compute_assigned(self):
+        for record in self:
+            record.assigned = self.user_id and True or False # Es pot fer amb un if però així és més limpio
+
+    
+    @api.depends('user_id')
+    def _compute_ticket_qty(self):
+        for record in self:
+            other_tickets = self.env['helpdesk.ticket'].search([('user_id', '=', record.user_id.id)])
+            record.ticket_qty = len(other_tickets)
+
+    
+    def create_tag(self):
+        self.ensure_one()
+        self.write({
+            'tag_ids': [(0,0,{'name': self.tag_name})]
+        })
+        self.tag_name = False # Esborra el text després de crear el tag
