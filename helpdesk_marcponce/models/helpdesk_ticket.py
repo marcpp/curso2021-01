@@ -14,7 +14,7 @@ class HelpdeskTicketAction(models.Model):
 
 class HelpdeskTicketTag(models.Model):
     _name = 'helpdesk.ticket.tag'
-    _description = 'Tickets helpdesk action'
+    _description = 'Tickets helpdesk tag'
 
     name = fields.Char()
     tag_ids = fields.Many2many(
@@ -90,6 +90,10 @@ class HelpdeskTicket(models.Model):
     )
     tag_name = fields.Char(
         string = 'Tag name'
+    )
+    color = fields.Integer(
+        string = 'Color', 
+        default=10
     )
 
 
