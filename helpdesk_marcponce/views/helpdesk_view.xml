@@ -73,7 +73,23 @@
                             <field name="tag_ids"/>
                         </page>
                         <page string="Actions">
-                            <field name="action_ids"/>
+                            <field name="action_ids" context="{'default_date':date}">
+                            <!-- En el ticket tenemos un campo action_ids, y no tenemos definida una vista para 
+                            el modelo al que apunta, crear una vista embevida, y vamos a ocultar el m2o en 
+                            el formulario que aputna al o2m en el inverse_name. -->
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="time"/>
+                                </tree>
+                                <form>
+                                    <group name="action">
+                                        <field name="name"/>
+                                        <field name="date"/>
+                                        <field name="time"/>
+                                    </group>
+                                </form>
+                            </field>
                         </page>
                         <page string="Quality">
                             <group string="Corrective Action">

@@ -1,4 +1,6 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+from datetime import timedelta
 
 class HelpdeskTicketAction(models.Model):
     _name = 'helpdesk.ticket.action'
@@ -6,6 +8,9 @@ class HelpdeskTicketAction(models.Model):
 
     name = fields.Char()
     date = fields.Date()
+    time = fields.Float(
+        string='Time'
+    )
     ticket_id = fields.Many2one(
         comodel_name = 'helpdesk.ticket',
         string = "Ticket"
@@ -17,6 +22,7 @@ class HelpdeskTicketTag(models.Model):
     _description = 'Tickets helpdesk tag'
 
     name = fields.Char()
+    public = fields.Boolean() 
     tag_ids = fields.Many2many(
         comodel_name = 'helpdesk.ticket',
         relation = 'helpdesk_ticket_tag_rel',
@@ -25,10 +31,21 @@ class HelpdeskTicketTag(models.Model):
         string = 'Tickets'
     )
 
+    @api.model
+    def cron_delete_tag(self):
+        tickets = self.search([('ticket_ids', '=', False)])
+        tickets.unlink()
+
 
 class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
     _description = 'Tickets helpdesk'
+
+
+    # Els defauls es posen antes de la definició dels camps
+    def _date_default_today(self):
+        return fields.Date.today()
+
 
     name = fields.Char(
         string='name',
@@ -38,7 +55,8 @@ class HelpdeskTicket(models.Model):
         string='Description'
     )
     date = fields.Date(
-        string='Date'
+        string='Date',
+        default=_date_default_today
     )
     state = fields.Selection(
         [('new', 'New'),
@@ -51,7 +69,10 @@ class HelpdeskTicket(models.Model):
         default='new'
     )
     time = fields.Float(
-        string='Time'
+        string='Time',
+        compute='_get_time',
+        inverse='_set_time',
+        search='_search_time'
     )
     assigned = fields.Boolean(
         string='Assigned',
@@ -132,7 +153,47 @@ class HelpdeskTicket(models.Model):
     
     def create_tag(self):
         self.ensure_one()
-        self.write({
-            'tag_ids': [(0,0,{'name': self.tag_name})]
-        })
+        # self.write({
+        #     'tag_ids': [(0,0,{'name': self.tag_name})]
+        # })
+        #self.tag_name = False # Esborra el text després de crear el tag
+
+        # pasa por context el valor del nuevo nombre y la relación con el ticket
+        action = self.env.ref('helpdesk_marcponce.action_new_tag').read()[0]
+        # Si passa per context el que volem fer no crea el tag fins que es polsa crear, si no es crea directament
+        action['context'] = {
+            'default_name': self.tag_name,
+            'default_ticket_ids': [(6, 0, self.ids)]
+        }
         self.tag_name = False # Esborra el text després de crear el tag
+        return action
+
+    
+    @api.constrains( 'time')
+    def _verify_time_positive(self):
+        for ticket in self:
+            if ticket.time and ticket.time<0:
+                raise ValidationError (_("The time cannot be negative" ))
+
+
+    @api.onchange('date','time')
+    def _onchange_date(self):
+        self.date_limit = self.date and self.date + timedelta(days=1)
+
+
+    @api.depends('action_ids.time')
+    def _get_time(self):
+        for record in self:
+            record.time = sum(record.action_ids.mapped('time'))
+    
+    def _set_time(self):
+        for record in self:
+            time_now = sum(record.action_ids.mapped('time'))
+            next_time = record.time - time_now
+            if next_time:
+                data = {'name': '/', 'time': next_time, 'date': fields.Date.today(), 'ticket_id': record.id}
+                self.env['helpdesk.ticket.action'].create(data)
+    
+    def _search_time(self, operator, value):
+        actions = self.env['helpdesk.ticket.action'].search([('time', operator, value)])
+        return [('id', 'in', actions.mapped('ticket_id').ids)]
