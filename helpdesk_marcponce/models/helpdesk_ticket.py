@@ -119,23 +119,35 @@ class HelpdeskTicket(models.Model):
 
 
     def state_to_assign(self):
+        self.ensure_one()
         self.state = 'assigned'
 
 
     def state_to_inprocess(self):
+        self.ensure_one()
         self.state = 'inprocess'
 
 
     def state_to_pending(self):
+        self.ensure_one()
         self.state = 'pending'
 
 
     def state_to_finalize(self):
+        self.ensure_one()
         self.state = 'resolved'
 
 
     def state_to_cancel(self):
+        self.ensure_one()
         self.state = 'resolved'
+
+
+    def state_to_cancel_multi(self):
+        # com cancelar és ensure_one creo un altre mètode que crida varies vegades a cancelar
+        # usat a sale_helpdesk_marcponce
+        for record in self:
+            record.state_to_cancel()
 
     
     @api.depends('user_id')
