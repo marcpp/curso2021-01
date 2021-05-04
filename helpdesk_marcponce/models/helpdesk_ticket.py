@@ -40,6 +40,12 @@ class HelpdeskTicketTag(models.Model):
 class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
     _description = 'Tickets helpdesk'
+    _inherit = [
+        'mail.thread.cc',
+        'mail.thread.blacklist',
+        'mail.activity.mixin'
+    ]
+    _primary_email = 'email_from'
 
 
     # Els defauls es posen antes de la definició dels camps
@@ -116,6 +122,7 @@ class HelpdeskTicket(models.Model):
         string = 'Color', 
         default=10
     )
+    email_from = fields.Char()
 
 
     def state_to_assign(self):
