@@ -53,6 +53,13 @@ class HelpdeskTicket(models.Model):
         return fields.Date.today()
 
 
+    @api.model
+    def default_get(self, dafault_fields):
+        vals = super(HelpdeskTicket, self).default_get(dafault_fields)
+        vals.update({'date': fields.Date.today() + timedelta(days=1)})
+        return vals
+
+
     name = fields.Char(
         string='name',
         required=True

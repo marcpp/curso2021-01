@@ -205,9 +205,4 @@
         </field>
     </record>
 
-    <!-- Menú -->
-    <menuitem id="helpdesk_menu_root" name="Helpdesk" sequence="10"/>
-    <menuitem id="helpdesk_menu_submenu" name="Helpdesk" sequence="10" parent="helpdesk_menu_root"/>
-    <menuitem id="helpdesk_menu_ticket" name="Ticket" sequence="10" parent="helpdesk_menu_submenu" action="view_helpdesk_ticket_action"/>
-
 </odoo>

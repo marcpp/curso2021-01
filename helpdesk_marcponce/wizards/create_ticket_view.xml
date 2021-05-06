@@ -7,13 +7,13 @@
         <field name="arch" type="xml">
             <form string="Create ticket">
                 <p class="oe_grey">
-                    Ticket will be created with this tag
+                    Ticket will be created with this tag.
                 </p>
                 <group>
                     <field name="name"/>
                 </group>
                 <footer>
-                    <button name="create_ticket" id="create_ticket" string="Create Ticket" type="object"/>
+                    <button name="create_ticket" id="create_ticket" string="Create Tag" type="object"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
